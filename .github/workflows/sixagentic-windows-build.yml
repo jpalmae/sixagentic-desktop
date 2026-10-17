@@ -1,0 +1,105 @@
+name: SixAgentic Desktop Windows Build
+
+# Builds the SixAgentic Desktop MSIX installer for Windows (x64 + arm64)
+# on the fork's own runners, without upstream release gates (tag admission,
+# R2 staging, signing envs). Artifacts land on the GitHub run for download.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/desktop/**'
+      - '.github/workflows/sixagentic-windows-build.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    name: SixAgentic Desktop ${{ matrix.target.label }}
+    runs-on: ${{ matrix.target.runner }}
+    timeout-minutes: 900
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - label: win32-x64
+            runner: windows-2025
+          - label: win32-arm64
+            runner: windows-11-arm
+    env:
+      HERMES_DESKTOP_VARIANT: bundled
+      PYTHONUTF8: '1'
+      ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
+    steps:
+      - name: Exclude build paths from Defender scanning
+        shell: powershell
+        run: |
+          $paths = @($env:GITHUB_WORKSPACE, $env:RUNNER_TEMP, (npm config get cache))
+          foreach ($p in $paths) {
+            try { Add-MpPreference -ExclusionPath $p } catch { Write-Host "Defender exclusion skipped: $($_.Exception.Message)" }
+          }
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Resolve electron-builder version
+        id: electron-tools
+        shell: bash
+        run: |
+          node -e '
+            const l = require("./package-lock.json")
+            const eb = l.packages["node_modules/electron-builder"].version
+            if (!eb) process.exit(1)
+            console.log("eb=" + eb)
+          ' >> "$GITHUB_OUTPUT"
+
+      - name: Restore electron-builder toolchain cache
+        id: electron-tools-restore
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cache/electron-builder
+          key: eb3-${{ runner.os }}-${{ runner.arch }}-builder-${{ steps.electron-tools.outputs.eb }}
+          restore-keys: |
+            eb3-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Build the SixAgentic Desktop Windows installer
+        shell: powershell
+        timeout-minutes: 880
+        run: |
+          $commit = git rev-parse HEAD
+          python scripts/bundles/desktop.py --commit $commit --variant bundled `
+            --work "$env:RUNNER_TEMP/desktop-job" --cache "$env:GITHUB_WORKSPACE/.cache/desktop-inputs"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Locate release artifacts
+        id: artifacts
+        shell: bash
+        run: |
+          ls apps/desktop/release/ || true
+          echo "dir=apps/desktop/release" >> "$GITHUB_OUTPUT"
+
+      - name: Upload MSIX bundle + installer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SixAgenticDesktop-${{ matrix.target.label }}
+          path: |
+            apps/desktop/release/*.msix
+            apps/desktop/release/*.msixbundle
+            apps/desktop/release/*.appinstaller
+            apps/desktop/release/*.zip
+          if-no-files-found: warn
+          retention-days: 30
