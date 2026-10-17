@@ -28,6 +28,8 @@ jobs:
             runner: windows-2025
           - label: win32-arm64
             runner: windows-11-arm
+          - label: linux-x64
+            runner: ubuntu-24.04
     env:
       HERMES_DESKTOP_VARIANT: bundled
       PYTHONUTF8: '1'
@@ -92,7 +94,7 @@ jobs:
           ls apps/desktop/release/ || true
           echo "dir=apps/desktop/release" >> "$GITHUB_OUTPUT"
 
-      - name: Upload MSIX bundle + installer artifacts
+      - name: Upload MSIX/AppImage/deb/rpm artifacts
         uses: actions/upload-artifact@v4
         with:
           name: SixAgenticDesktop-${{ matrix.target.label }}
@@ -101,5 +103,8 @@ jobs:
             apps/desktop/release/*.msixbundle
             apps/desktop/release/*.appinstaller
             apps/desktop/release/*.zip
+            apps/desktop/release/*.AppImage
+            apps/desktop/release/*.deb
+            apps/desktop/release/*.rpm
           if-no-files-found: warn
           retention-days: 30
