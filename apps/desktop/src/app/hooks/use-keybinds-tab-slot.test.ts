@@ -7,25 +7,15 @@ vi.mock('@/themes/context', () => ({
   useTheme: () => ({ resolvedMode: 'dark' as const, setMode: () => undefined })
 }))
 
-const switchProfileToSlot = vi.hoisted(() => vi.fn())
-
-vi.mock('@/store/profile', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  switchProfileToSlot
-}))
-
 import { useKeybinds } from '@/app/hooks/use-keybinds'
 import { findGroup, group, split } from '@/components/pane-shell/tree/model'
 import { $activeTreeGroup, $hoveredTreeGroup, $layoutTree } from '@/components/pane-shell/tree/store'
 import { registry } from '@/contrib/registry'
 import { isMacPlatform } from '@/lib/platform'
 
-// ⌘1…⌘9 is one chord with two meanings: the Nth tab of the zone under the
-// pointer (else the focused zone, else the workspace's) when that zone is a
-// real tab strip, and the Nth profile otherwise. `view.tabSlot.N` runs first
-// and passes through to `profile.switch.N` when no rung is eligible — the
-// pre-#92569 behavior, expressed as two rebindable actions instead of one
-// handler that hardcoded the tab dispatch.
+// ⌘1…⌘9 activates the Nth tab of the zone under the pointer (else the focused
+// zone, else the workspace's) when that zone is a real tab strip. With no
+// eligible strip `view.tabSlot.N` declines and the press is a no-op (#92569).
 
 const wrapper = ({ children }: { children: ReactNode }) => createElement(MemoryRouter, null, children)
 
@@ -57,7 +47,6 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
-  switchProfileToSlot.mockClear()
   unmountKeybinds = renderHook(
     () =>
       useKeybinds({
@@ -79,8 +68,8 @@ afterEach(() => {
   $hoveredTreeGroup.set(null)
 })
 
-describe('⌘N over a tab strip is a tab switch, elsewhere a profile switch', () => {
-  it('activates the Nth tab of the hovered zone and leaves the profile alone', () => {
+describe('⌘N over a tab strip is a tab switch, elsewhere a no-op', () => {
+  it('activates the Nth tab of the hovered zone', () => {
     $layoutTree.set(
       split('row', [
         group(['workspace', 'a'], { active: 'workspace', id: 'left' }),
@@ -93,10 +82,9 @@ describe('⌘N over a tab strip is a tab switch, elsewhere a profile switch', ()
     press(2)
 
     expect(activePane('left')).toBe('a')
-    expect(switchProfileToSlot).not.toHaveBeenCalled()
   })
 
-  it('falls through to the profile switch when no zone is a tab strip', () => {
+  it('does nothing when no zone is a tab strip', () => {
     $layoutTree.set(
       split('row', [
         group(['workspace'], { active: 'workspace', id: 'left' }),
@@ -108,16 +96,16 @@ describe('⌘N over a tab strip is a tab switch, elsewhere a profile switch', ()
 
     press(2)
 
-    expect(switchProfileToSlot).toHaveBeenCalledWith(2)
+    expect(activePane('left')).toBe('workspace')
+    expect(activePane('right')).toBe('b')
   })
 
-  it('falls through when the strip has no Nth tab', () => {
+  it('does nothing when the strip has no Nth tab', () => {
     $layoutTree.set(split('row', [group(['workspace', 'a'], { active: 'workspace', id: 'left' })]))
     $hoveredTreeGroup.set('left')
 
     press(3)
 
     expect(activePane('left')).toBe('workspace')
-    expect(switchProfileToSlot).toHaveBeenCalledWith(3)
   })
 })

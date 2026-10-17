@@ -48,7 +48,6 @@ import {
   PanelTop,
   SlidersHorizontal,
   Upload,
-  Users,
   Zap
 } from '@/lib/icons'
 import { type KeybindContribution, KEYBINDS_AREA } from '@/lib/keybinds/actions'
@@ -71,7 +70,6 @@ import {
   sidebarSide
 } from '@/store/layout'
 import { $profiles } from '@/store/profile'
-import { $profileRailVisible } from '@/store/profile-rail-prefs'
 import { runExportProfileFlow, runImportProfileFlow } from '@/store/profile-share'
 import {
   $reviewOpen,
@@ -369,15 +367,6 @@ registry.registerMany([
     keywords: ['status bar', 'statusbar', 'bottom bar', 'hide', 'show', 'chrome'],
     get: () => $statusbarVisible.get(),
     set: enabled => $statusbarVisible.set(enabled)
-  }),
-  paletteToggle({
-    id: 'view.toggleProfileRail',
-    label: 'Toggle profile rail',
-    action: 'view.toggleProfileRail',
-    icon: Users,
-    keywords: ['profile rail', 'profile bar', 'profile strip', 'profiles', 'sidebar', 'hide', 'show', 'chrome'],
-    get: () => $profileRailVisible.get(),
-    set: enabled => $profileRailVisible.set(enabled)
   }),
   // Simple hides most of the chrome that would offer the way back, so ⌘K is a
   // guaranteed door (alongside the layout editor and Settings → Appearance).

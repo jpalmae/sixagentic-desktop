@@ -378,7 +378,7 @@ const classicPalette = (colors: Record<string, string>) => skinToDesktopTheme({ 
  */
 export const classicTheme: DesktopTheme = {
   name: 'classic',
-  label: 'Classic Hermes',
+  label: 'Classic', // SixAgentic Desktop rebrand (was "Classic Hermes")
   description: "Gold on navy, the CLI's original look",
   colors: classicPalette(CLASSIC_LIGHT_SKIN_COLORS),
   darkColors: classicPalette(CLASSIC_DARK_SKIN_COLORS)
@@ -441,7 +441,93 @@ export const slateTheme: DesktopTheme = {
   }
 }
 
+/* SixAgentic Desktop rebrand — the default identity. SixManager design language
+ * (sixmanager.com): deep navy-black #050713 base, #0D1228 surfaces,
+ * electric light blue #7FC4FF accent, #4689C8 secondary accent, green
+ * #559E44 status. Dark-only by intent — the whole aesthetic is the dark
+ * end of the spectrum (light mode synthesizes a palette like Midnight's).
+ * Typography: DM Mono for UI/mono, Archivo Black for display headings,
+ * Instrument Serif italic for emphasized words — all one Google Fonts
+ * stylesheet. */
+export const sixagenticTheme: DesktopTheme = {
+  name: 'sixagentic',
+  label: 'SixAgentic Desktop',
+  description: 'System-online enterprise terminal — navy-black, electric blue',
+  colors: {
+    background: '#050713',
+    foreground: '#F5F7FA',
+    card: '#0D1228',
+    cardForeground: '#F5F7FA',
+    muted: '#0D1228',
+    mutedForeground: 'rgba(255,255,255,0.55)',
+    popover: '#0D1228',
+    popoverForeground: '#F5F7FA',
+    primary: '#7FC4FF',
+    primaryForeground: '#050713',
+    secondary: '#252E5A',
+    secondaryForeground: '#F5F7FA',
+    accent: 'rgba(127,196,255,0.14)',
+    accentForeground: '#7FC4FF',
+    border: 'rgba(255,255,255,0.22)',
+    input: 'rgba(255,255,255,0.22)',
+    ring: '#7FC4FF',
+    midground: '#4689C8',
+    midgroundForeground: '#F5F7FA',
+    composerRing: '#7FC4FF',
+    destructive: '#ef5350',
+    destructiveForeground: '#F5F7FA',
+    sidebarBackground: '#050713',
+    sidebarBorder: 'rgba(255,255,255,0.22)',
+    userBubble: '#0D1228',
+    userBubbleBorder: 'rgba(255,255,255,0.22)'
+  },
+  typography: {
+    fontSans: SYSTEM_SANS,
+    fontMono: `"DM Mono", ${SYSTEM_MONO}`,
+    fontUrl:
+      'https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Archivo+Black&family=Instrument+Serif:ital@0;1&display=swap'
+  },
+  terminal: {
+    foreground: '#F5F7FA',
+    cursor: '#7FC4FF',
+    selectionBackground: '#252E5A',
+    black: '#0D1228',
+    red: '#ef5350',
+    green: '#559E44',
+    yellow: '#d29922',
+    blue: '#7FC4FF',
+    magenta: '#bc8cff',
+    cyan: '#56d4dd',
+    white: '#F5F7FA',
+    brightBlack: '#252E5A',
+    brightRed: '#ff7b72',
+    brightGreen: '#6fce62',
+    brightYellow: '#e3b341',
+    brightBlue: '#7FC4FF',
+    brightMagenta: '#d2a8ff',
+    brightCyan: '#7fe3ea',
+    brightWhite: '#ffffff'
+  },
+  customCSS: `
+    /* SixAgentic Desktop rebrand — enterprise-terminal chrome: Archivo Black display
+     * headings, DM Mono uppercase section labels, Instrument Serif emphasis. */
+    h1, h2, h3 {
+      font-family: 'Archivo Black', 'Archivo', sans-serif;
+      letter-spacing: -0.01em;
+    }
+    h1 em, h2 em, h3 em {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-weight: 400;
+    }
+    kbd, .font-mono {
+      font-family: 'DM Mono', 'JetBrains Mono', ui-monospace, monospace;
+    }
+  `
+}
+
 export const BUILTIN_THEMES: Record<string, DesktopTheme> = {
+  sixagentic: sixagenticTheme,
   nous: nousTheme,
   github: githubTheme,
   catppuccin: catppuccinTheme,
@@ -459,7 +545,7 @@ export const BUILTIN_THEMES: Record<string, DesktopTheme> = {
 export const BUILTIN_THEME_LIST = Object.values(BUILTIN_THEMES)
 
 /** Skin used when nothing is persisted or the persisted name is retired. */
-export const DEFAULT_SKIN_NAME = 'nous'
+export const DEFAULT_SKIN_NAME = 'sixagentic' // SixAgentic Desktop rebrand
 
 /** Names that no longer resolve to a skin of their own. A stored pick of one
  *  falls back to DEFAULT_SKIN_NAME, and a cached backend theme under one is

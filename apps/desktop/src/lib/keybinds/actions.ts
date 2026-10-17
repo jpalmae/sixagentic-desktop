@@ -9,7 +9,7 @@ import { registry } from '@/contrib/registry'
 import type { Contribution } from '@/contrib/types'
 import { isMacPlatform } from '@/lib/platform'
 
-export type KeybindCategory = 'composer' | 'profiles' | 'session' | 'navigation' | 'view'
+export type KeybindCategory = 'composer' | 'session' | 'navigation' | 'view'
 
 // The self-referential opener — bound + dispatched like any action, but shown in
 // the panel subtitle (not as its own row).
@@ -17,7 +17,7 @@ export const KEYBIND_PANEL_ACTION = 'keybinds.openPanel'
 
 // `composer` is read-only; the rest are rebindable. `view` is the catch-all for
 // layout, appearance, and the panel-opener.
-export const KEYBIND_CATEGORIES: readonly KeybindCategory[] = ['composer', 'profiles', 'session', 'navigation', 'view']
+export const KEYBIND_CATEGORIES: readonly KeybindCategory[] = ['composer', 'session', 'navigation', 'view']
 
 export interface KeybindActionMeta {
   id: string
@@ -39,27 +39,14 @@ export interface KeybindActionMeta {
   editableTargetPolicy?: 'modified'
 }
 
-// Positional switch slots for *named* profiles: ⌘1…⌘9 for profiles 1-9, then
-// ⌘⌥1…⌘⌥9 for 10-18. The default profile gets the two-key mnemonic ⌘D (see
-// `profile.default`) — ⌘` is macOS-reserved (window cycling) and ⌘0 is reset-zoom.
-export const PROFILE_SLOT_COUNT = 18
-
 function comboForSlot(slot: number): string {
   return slot <= 9 ? `mod+${slot}` : `mod+alt+${slot - 9}`
 }
 
-const PROFILE_SWITCH_ACTIONS: KeybindActionMeta[] = Array.from({ length: PROFILE_SLOT_COUNT }, (_, i) => ({
-  id: `profile.switch.${i + 1}`,
-  category: 'profiles' as const,
-  defaults: [comboForSlot(i + 1)]
-}))
-
 // Positional tab-slot jumps — activate the Nth visible tab of the zone under
-// the pointer (else the focused zone, else the workspace's). They share
-// ⌘1…⌘9 with the profile switchers and pass through when no eligible tab
-// strip exists, so the same chord is "tab N" over a strip and "profile N"
-// anywhere else (#92569: the two are separate actions, so rebinding either
-// changes only that one).
+// the pointer (else the focused zone, else the workspace's). They pass through
+// when no eligible tab strip exists, so rebinding one changes only that one
+// (#92569).
 export const TAB_SLOT_COUNT = 9
 
 const TAB_SLOT_ACTIONS: KeybindActionMeta[] = Array.from({ length: TAB_SLOT_COUNT }, (_, i) => ({
@@ -69,7 +56,7 @@ const TAB_SLOT_ACTIONS: KeybindActionMeta[] = Array.from({ length: TAB_SLOT_COUN
   passthrough: true
 }))
 
-// Positional jumps — ^1…^9, mirroring profiles' ⌘1…⌘9.
+// Positional jumps — ^1…^9.
 export const SESSION_SLOT_COUNT = 9
 
 const SESSION_SLOT_ACTIONS: KeybindActionMeta[] = Array.from({ length: SESSION_SLOT_COUNT }, (_, i) => ({
@@ -102,16 +89,8 @@ export const KEYBIND_ACTIONS: readonly KeybindActionMeta[] = [
   { id: 'composer.reasoningUp', category: 'composer', defaults: [], editableTargetPolicy: 'modified' },
   { id: 'composer.reasoningDown', category: 'composer', defaults: [], editableTargetPolicy: 'modified' },
 
-  // ── Profiles ─────────────────────────────────────────────────────────────
-  // Tab-slot actions BEFORE profile switchers: they claim ⌘1…⌘9 first and
-  // pass through to the profile switch when no tab strip is eligible.
+  // ── Tab slots ────────────────────────────────────────────────────────────
   ...TAB_SLOT_ACTIONS,
-  { id: 'profile.default', category: 'profiles', defaults: ['mod+d'] },
-  ...PROFILE_SWITCH_ACTIONS,
-  { id: 'profile.next', category: 'profiles', defaults: ['mod+shift+]'] },
-  { id: 'profile.prev', category: 'profiles', defaults: ['mod+shift+['] },
-  { id: 'profile.toggleAll', category: 'profiles', defaults: ['mod+shift+0'] },
-  { id: 'profile.create', category: 'profiles', defaults: [] },
 
   // ── Session ──────────────────────────────────────────────────────────────
   // `shift+n` was dropped from the defaults (#76185): a bare shifted letter
@@ -147,7 +126,6 @@ export const KEYBIND_ACTIONS: readonly KeybindActionMeta[] = [
   { id: 'nav.commandPalette', category: 'navigation', defaults: ['mod+k', 'mod+p'] },
   { id: 'nav.commandCenter', category: 'navigation', defaults: ['mod+.'] },
   { id: 'nav.settings', category: 'navigation', defaults: ['mod+,'] },
-  { id: 'nav.profiles', category: 'navigation', defaults: [] },
   { id: 'nav.capabilities', category: 'navigation', defaults: [] },
   { id: 'nav.messaging', category: 'navigation', defaults: [] },
   { id: 'nav.artifacts', category: 'navigation', defaults: [] },
@@ -171,8 +149,6 @@ export const KEYBIND_ACTIONS: readonly KeybindActionMeta[] = [
   // way back has to already exist. (⌥+letter emits a symbol on macOS; the
   // binding resolves through KeyT via comboFromEvent's `event.code` fallback.)
   { id: 'view.toggleTabStrip', category: 'view', defaults: ['mod+alt+t'] },
-  // Unbound: the rail is a one-time preference, not something to flip mid-chat.
-  { id: 'view.toggleProfileRail', category: 'view', defaults: [] },
   // Unbound for the same reason: Simple ↔ Advanced is a stance, not a view
   // toggle; ⌘K, the layout editor and Settings → Appearance are its doors.
   { id: 'view.toggleSimpleMode', category: 'view', defaults: [] },
@@ -194,8 +170,8 @@ export const KEYBIND_ACTIONS: readonly KeybindActionMeta[] = [
   { id: 'view.showTerminal', category: 'view', defaults: ['ctrl+`'] },
   { id: 'view.newTerminal', category: 'view', defaults: ['ctrl+shift+`'] },
   // Same Ctrl(+Shift) terminal family: arrows walk the (vertical) tab rail, W
-  // kills the active one. ⌘W is taken (close preview tab) and ⌘⇧[ ] are profiles,
-  // so these stay on `ctrl` — distinct on macOS, folding to Ctrl elsewhere.
+  // kills the active one. ⌘W is taken (close preview tab), so these stay on
+  // `ctrl` — distinct on macOS, folding to Ctrl elsewhere.
   { id: 'view.nextTerminal', category: 'view', defaults: ['ctrl+shift+down'] },
   { id: 'view.prevTerminal', category: 'view', defaults: ['ctrl+shift+up'] },
   { id: 'view.closeTerminal', category: 'view', defaults: ['ctrl+shift+w'] },
@@ -248,7 +224,6 @@ export const PLUGIN_APP_ACTIONS = [
   // Navigation
   'nav.commandPalette',
   'nav.settings',
-  'nav.profiles',
   'nav.capabilities',
   'nav.messaging',
   'nav.artifacts',

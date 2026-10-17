@@ -233,7 +233,7 @@ export function createPortalSession({
       // hang the discovery call behind an invisible window.
       const outcome = await driveCookieWindow(sess, previous, {
         kind: 'portal-renew',
-        title: 'Renewing Hermes Cloud session…',
+        title: 'Renewing SixAgentic Cloud session…', // SixAgentic Desktop rebrand
         show: false,
         pollMs: 500,
         deadlineMs: 12_000
@@ -270,7 +270,7 @@ export function createPortalSession({
 
     const outcome = await driveCookieWindow(sess, await readAccessCookies(), {
       kind: 'portal',
-      title: 'Sign in to Hermes Cloud',
+      title: 'Sign in to SixAgentic Cloud', // SixAgentic Desktop rebrand
       show: true,
       pollMs: 750
     })

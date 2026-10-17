@@ -20,7 +20,6 @@ import { findBarClaimsCombo } from '@/lib/find-in-page'
 import {
   contributedKeybindHandler,
   keybindAction,
-  PROFILE_SLOT_COUNT,
   SESSION_SLOT_COUNT,
   TAB_SLOT_COUNT
 } from '@/lib/keybinds/actions'
@@ -52,15 +51,7 @@ import {
 } from '@/store/layout'
 import { notifyError } from '@/store/notifications'
 import { toggleBrowserTab } from '@/store/preview'
-import {
-  $newChatProfile,
-  cycleProfile,
-  requestProfileCreate,
-  switchProfileToSlot,
-  switchToDefaultProfile,
-  toggleShowAllProfiles
-} from '@/store/profile'
-import { toggleProfileRailVisible } from '@/store/profile-rail-prefs'
+import { $newChatProfile } from '@/store/profile'
 import { openFolderAsProject } from '@/store/projects'
 import { toggleReview } from '@/store/review'
 import {
@@ -108,7 +99,6 @@ import {
   MESSAGING_ROUTE,
   navigateToWorkspacePage,
   NEW_CHAT_ROUTE,
-  PROFILES_ROUTE,
   sessionRoute,
   SETTINGS_ROUTE
 } from '../routes'
@@ -144,8 +134,6 @@ export function useKeybinds(deps: KeybindRuntimeDeps): void {
   const handlersRef = useRef<HandlerMap>({})
   const commitSwitcherRef = useRef<() => void>(() => {})
 
-  const profileSwitchHandlers: HandlerMap = {}
-
   // A tab key that lands on the WORKSPACE tab while a full page (skills /
   // messaging / artifacts / a plugin route) covers it must also route back to
   // the chat: the workspace pane is already the zone's active tab behind the
@@ -157,15 +145,6 @@ export function useKeybinds(deps: KeybindRuntimeDeps): void {
       const selected = $selectedStoredSessionId.get()
 
       navigate(selected ? sessionRoute(selected) : NEW_CHAT_ROUTE)
-    }
-  }
-
-  for (let slot = 1; slot <= PROFILE_SLOT_COUNT; slot += 1) {
-    // Unconditional: the ⌘1…⌘9 tab dispatch is view.tabSlot.N, which sits
-    // ahead of this action on the same chord and passes through when no tab
-    // strip is eligible (#92569).
-    profileSwitchHandlers[`profile.switch.${slot}`] = () => {
-      switchProfileToSlot(slot)
     }
   }
 
@@ -187,7 +166,7 @@ export function useKeybinds(deps: KeybindRuntimeDeps): void {
 
   // view.tabSlot.N: activate the Nth visible tab of the hovered / focused /
   // workspace zone (`activateTreeTabSlot`'s ladder). Declines when no rung is
-  // a real tab strip, so the chord falls through to profile.switch.N.
+  // a real tab strip, so a chord shared with another action falls through.
   const tabSlotHandlers: HandlerMap = {}
 
   for (let slot = 1; slot <= TAB_SLOT_COUNT; slot += 1) {
@@ -301,7 +280,6 @@ export function useKeybinds(deps: KeybindRuntimeDeps): void {
     },
     'nav.commandCenter': deps.toggleCommandCenter,
     'nav.settings': () => navigate(SETTINGS_ROUTE),
-    'nav.profiles': () => navigate(PROFILES_ROUTE),
     'nav.capabilities': () => navigateToWorkspacePage(navigate, CAPABILITIES_ROUTE),
     'nav.messaging': () => navigateToWorkspacePage(navigate, MESSAGING_ROUTE),
     'nav.artifacts': () => navigateToWorkspacePage(navigate, ARTIFACTS_ROUTE),
@@ -346,7 +324,6 @@ export function useKeybinds(deps: KeybindRuntimeDeps): void {
     'view.toggleRightSidebar': () => (layoutHasRightSide() ? toggleRightSide() : toggleTerminalPane()),
     'view.toggleReview': toggleReview,
     'view.toggleStatusbar': toggleStatusbarVisible,
-    'view.toggleProfileRail': toggleProfileRailVisible,
     'view.toggleSimpleMode': toggleSimpleMode,
     'view.toggleTabStrip': () => void toggleTargetZoneTabStrip(),
     'view.showFiles': showFiles,
@@ -389,14 +366,7 @@ export function useKeybinds(deps: KeybindRuntimeDeps): void {
     'view.findNext': findNextMatch,
     'view.findPrevious': findPreviousMatch,
 
-    'appearance.toggleMode': () => setMode(resolvedMode === 'dark' ? 'light' : 'dark'),
-
-    'profile.default': switchToDefaultProfile,
-    ...profileSwitchHandlers,
-    'profile.next': () => cycleProfile(1),
-    'profile.prev': () => cycleProfile(-1),
-    'profile.toggleAll': toggleShowAllProfiles,
-    'profile.create': requestProfileCreate
+    'appearance.toggleMode': () => setMode(resolvedMode === 'dark' ? 'light' : 'dark')
   }
 
   // Plugins run built-in actions by id (`ctx.runAction`) through this same

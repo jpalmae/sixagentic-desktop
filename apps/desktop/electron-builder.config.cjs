@@ -78,7 +78,8 @@ module.exports = {
   protocols: [
     {
       name: `${displayName} Protocol`,
-      schemes: ['hermes']
+      /* SixAgentic rebrand — sixagentic:// is ours; hermes:// stays with Hermes Desktop. */
+      schemes: ['sixagentic']
     }
   ],
   // A store build is archived, never served to a feed — prefix its artifact

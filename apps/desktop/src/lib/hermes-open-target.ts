@@ -14,7 +14,9 @@
 
 export type HermesOpenTarget = string | { href: string } | { path: string; params?: Record<string, string> }
 
-const HERMES_PROTOCOL = 'hermes:'
+/* SixAgentic Desktop rebrand — sixagentic:// is the registered scheme; hermes://
+ * stays accepted for legacy plugin `activate` payloads. */
+const HERMES_PROTOCOL = 'sixagentic:'
 
 /** Hostnames owned by core deep-link handlers — never treated as plugin routes. */
 const RESERVED_DEEP_LINK_KINDS = new Set([

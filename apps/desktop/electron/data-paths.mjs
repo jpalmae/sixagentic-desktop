@@ -27,9 +27,11 @@ export function platformDefaultHermesHome(home, env = process.env, platform = pr
   const suffix = env.HERMES_DATA_DIR_SUFFIX || ''
   if (platform === 'win32') {
     const base = (env.LOCALAPPDATA || '').trim() || path.win32.join(home, 'AppData', 'Local')
-    return path.win32.join(base, 'hermes') + suffix
+    /* SixAgentic Desktop rebrand — own data root, never %LOCALAPPDATA%\hermes. */
+    return path.win32.join(base, 'sixagentic') + suffix
   }
-  return path.posix.join(home, '.hermes') + suffix
+  /* SixAgentic Desktop rebrand — own data root, never ~/.hermes. */
+  return path.posix.join(home, '.sixagentic') + suffix
 }
 
 export function resolveDesktopUserData(defaultPath, env = process.env) {
@@ -45,7 +47,7 @@ export function resolveDesktopHermesHome({ home, env = process.env, platform = p
   }
   // Fresh-install rehearsals must not touch the real Hermes home.
   if (env.HERMES_DESKTOP_USER_DATA_DIR) {
-    return paths.join(paths.resolve(env.HERMES_DESKTOP_USER_DATA_DIR), 'hermes-home')
+    return paths.join(paths.resolve(env.HERMES_DESKTOP_USER_DATA_DIR), 'sixagentic-home')
   }
   if (platform === 'win32' && env.HERMES_HOME === undefined) {
     // Explorer can miss setx changes. An explicit empty value opts out of that fallback.
@@ -57,7 +59,7 @@ export function resolveDesktopHermesHome({ home, env = process.env, platform = p
   const defaultHome = platformDefaultHermesHome(home, env, platform)
   // Keep the legacy migration for ordinary installs, not isolated suffix runs.
   if (platform === 'win32' && !env.HERMES_DATA_DIR_SUFFIX) {
-    const legacy = paths.join(home, '.hermes')
+    const legacy = paths.join(home, '.sixagentic')
     if (!directoryExists(defaultHome) && directoryExists(legacy)) {
       return legacy
     }

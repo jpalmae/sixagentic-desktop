@@ -4,9 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 // pane (Focus layout's `files`) stays in `group.panes` but isn't a chip —
 // indexing the raw array made ⌘2 land on the strip's first session tab.
 //
-// `activateTreeTabSlot` backs the `view.tabSlot.N` actions, which share
-// ⌘1…⌘9 with `profile.switch.N` and pass through to it when no tab strip is
-// eligible (#92569).
+// `activateTreeTabSlot` backs the `view.tabSlot.N` actions, which pass through
+// when no tab strip is eligible (#92569).
 
 describe('activateTreeTabSlot indexes shown panes only', () => {
   beforeEach(() => {

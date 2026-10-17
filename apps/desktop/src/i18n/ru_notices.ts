@@ -10,7 +10,7 @@ export const ruNotices = {
   butterbar: {
     goTo: (index, total) => `Показать уведомление ${index} из ${total}`,
     legal: {
-      before: 'Использование Hermes Agent регулируется нашими ',
+      before: 'Использование SixAgentic Desktop Agent регулируется нашими ',
       terms: 'Условиями обслуживания',
       between: ' и ',
       privacy: 'Политикой конфиденциальности',
@@ -27,9 +27,9 @@ export const ruNotices = {
     sessionCommands: ruSessionCommands
   },
   keepAwakeOffer: {
-    title: 'Компьютер ушёл в сон, пока Hermes работал',
+    title: 'Компьютер ушёл в сон, пока SixAgentic Desktop работал',
     message:
-      'Hermes может не давать компьютеру засыпать, пока выполняется задача. Экран по-прежнему выключается, а от батареи компьютер всё равно может уснуть.',
+      'SixAgentic Desktop может не давать компьютеру засыпать, пока выполняется задача. Экран по-прежнему выключается, а от батареи компьютер всё равно может уснуть.',
     action: 'Не засыпать во время работы'
   }
 } satisfies Pick<TranslationOverrides, 'remoteDisplayBanner' | 'butterbar' | 'promptNotices' | 'keepAwakeOffer'>

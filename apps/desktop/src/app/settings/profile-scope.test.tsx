@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import { atom } from 'nanostores'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -36,95 +36,17 @@ beforeEach(() => {
 afterEach(cleanup)
 
 describe('SettingsProfileScope', () => {
-  it('renders nothing with fewer than two profiles', () => {
-    $profiles.set([profile('default', true)])
+  // The selector is retired: the desktop app edits the default profile only.
+  // The settings-scope store stays live for plugin deep links (covered by
+  // store/settings-scope.test.ts), but no page may surface a picker.
+  it('never renders, even with several profiles', () => {
+    $activeGatewayProfile.set('scout')
+    $profiles.set([profile('default', true), profile('coder'), profile('scout')])
 
     const { container } = render(<SettingsProfileScope />)
+
     expect(container.textContent).toBe('')
-  })
-
-  it('selecting another profile sets the shared override; re-selecting the active clears it', () => {
-    $profiles.set([profile('default', true), profile('coder')])
-
-    render(<SettingsProfileScope />)
-
-    fireEvent.click(screen.getByRole('button', { name: 'coder' }))
-    expect($settingsScopeOverride.get()).toBe('coder')
-
-    fireEvent.click(screen.getByRole('button', { name: 'default' }))
     expect($settingsScopeOverride.get()).toBeNull()
-  })
-
-  // #89190/#89162 class: after opening a Bot Mode chat, the ACTIVE profile is
-  // the bot's — so with no override the settings pages silently edit the bot's
-  // config. The target must be stated (accented) whenever it isn't the default
-  // profile, override or not.
-  it('states the edit target when the active profile is a non-default bot (no override)', () => {
-    $activeGatewayProfile.set('scout')
-    $profiles.set([profile('default', true), profile('scout')])
-
-    const { container } = render(<SettingsProfileScope />)
-
-    expect($settingsScopeOverride.get()).toBeNull()
-    expect(container.textContent).toContain('scout')
-    // The note is present and flagged loud (data-scope-loud marks the accented variant).
-    const note = container.querySelector('[role="status"]')
-    expect(note).toBeTruthy()
-    expect(note?.getAttribute('data-scope-loud')).toBe('true')
-  })
-
-  it('shows no note when following the active DEFAULT profile', () => {
-    $activeGatewayProfile.set('default')
-    $profiles.set([profile('default', true), profile('coder')])
-
-    const { container } = render(<SettingsProfileScope />)
-
-    expect(container.querySelector('[role="status"]')).toBeNull()
-  })
-
-  it('keeps the quiet note style for an explicit override onto the default profile', () => {
-    $activeGatewayProfile.set('scout')
-    $profiles.set([profile('default', true), profile('scout')])
-
-    render(<SettingsProfileScope />)
-
-    fireEvent.click(screen.getByRole('button', { name: 'default' }))
-    expect($settingsScopeOverride.get()).toBe('default')
-
-    const note = document.querySelector('[role="status"]')
-    expect(note).toBeTruthy()
-    expect(note?.hasAttribute('data-scope-loud')).toBe(false)
-  })
-
-  it('labels chips with the bot title, else the display name, else the slug', () => {
-    $profiles.set([
-      profile('default', true, { bot_title: 'JordyV', display_name: 'JordieF' }),
-      profile('default-2', false, { display_name: 'Copy' }),
-      profile('weather-man')
-    ])
-
-    render(<SettingsProfileScope />)
-
-    // Bot Mode title wins over display_name and the slug — same identity the
-    // Bots roster shows.
-    expect(screen.getByRole('button', { name: 'JordyV' })).toBeTruthy()
-    // display_name (profile.yaml) when no Bot Mode title exists.
-    expect(screen.getByRole('button', { name: 'Copy' })).toBeTruthy()
-    // Canonical slug when neither is set.
-    expect(screen.getByRole('button', { name: 'weather-man' })).toBeTruthy()
-  })
-
-  it('keeps selection keyed on the canonical name while showing the presentation label', () => {
-    $profiles.set([profile('default', true), profile('coder', false, { bot_title: 'JordyV' })])
-
-    render(<SettingsProfileScope />)
-
-    fireEvent.click(screen.getByRole('button', { name: 'JordyV' }))
-    // The label changed, the identity did not: the override stores the slug.
-    expect($settingsScopeOverride.get()).toBe('coder')
-    // The "applies to" note names the target the way its chip does.
-    expect(document.querySelector('[role="status"]')?.textContent).toContain('JordyV')
-    expect(document.querySelector('[role="status"]')?.textContent).not.toContain('coder')
   })
 })
 

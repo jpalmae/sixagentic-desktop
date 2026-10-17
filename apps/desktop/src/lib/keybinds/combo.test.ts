@@ -84,7 +84,7 @@ describe('actionAllowedInInput', () => {
     expect(actionAllowedInInput('view.findInPage', 'mod+f')).toBe(true)
     expect(actionAllowedInInput('nav.capabilities', 'mod+k')).toBe(true)
     expect(actionAllowedInInput('view.showTerminal', 'ctrl+`')).toBe(true)
-    expect(actionAllowedInInput('profile.next', 'mod+shift+]')).toBe(true)
+    expect(actionAllowedInInput('nav.settings', 'mod+,')).toBe(true)
 
     // A global action rebound onto a text-editing chord (Ctrl+A select-all,
     // Ctrl+E line-end, …) fires deliberately while typing — mod-chords are

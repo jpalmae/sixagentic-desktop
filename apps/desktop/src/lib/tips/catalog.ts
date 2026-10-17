@@ -50,7 +50,6 @@ export const TIP_CATALOG: readonly TipDef[] = [
   { id: 'artifacts', keybind: 'nav.artifacts', side: 'right', targets: ['[data-tour="sidebar-nav-artifacts"]'] },
   { id: 'cron', keybind: 'nav.cron', side: 'right', targets: ['[data-tour="sidebar-nav-cron"]'] },
   { id: 'command-palette', keybind: 'nav.commandPalette', side: 'right', targets: ['[data-tour="sessions-sidebar"]'] },
-  { id: 'profiles', keybind: 'profile.next', side: 'right', targets: ['[data-tour="profile-rail"]'] },
   { id: 'composer-mentions', side: 'top', targets: ['[data-tour="composer"]'] },
   { id: 'right-pane', keybind: 'view.toggleRightSidebar', side: 'bottom', targets: ['[data-tour="right-pane-toggle"]'] }
 ]

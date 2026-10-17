@@ -71,23 +71,23 @@ describe('Classic Hermes is an explicit Desktop pick, never inferred from stock 
   it.each([
     ['display.skin: default', stockDefaultSkin],
     ['display.skin unset', null]
-  ])('a stock user (%s) with no Desktop pick paints Nous on boot, connect and relaunch', async (_label, local) => {
+  ])('a stock user (%s) with no Desktop pick paints the SixAgentic Desktop default on boot, connect and relaunch', async (_label, local) => {
     let run = await launch(local)
-    expect(run.bootPaint).toBe('nous')
+    expect(run.bootPaint).toBe('sixagentic')
     run.connect()
     run.connect() // reconnect re-seed
-    expect(run.api.theme?.themeName).toBe('nous')
-    expect(paintedSkin()).toBe('nous')
+    expect(run.api.theme?.themeName).toBe('sixagentic')
+    expect(paintedSkin()).toBe('sixagentic')
 
     run = await launch(local)
-    expect(run.bootPaint).toBe('nous')
+    expect(run.bootPaint).toBe('sixagentic')
     run.connect()
-    expect(paintedSkin()).toBe('nous')
+    expect(paintedSkin()).toBe('sixagentic')
   })
 
   it('a Classic pick paints gold/navy (dark mode) and survives connect, reconnect and relaunch; a later Nous pick sticks', async () => {
     let run = await launch(stockDefaultSkin)
-    expect(run.api.theme?.availableThemes.find(t => t.name === 'classic')?.label).toBe('Classic Hermes')
+    expect(run.api.theme?.availableThemes.find(t => t.name === 'classic')?.label).toBe('Classic')
 
     act(() => run.api.theme?.setMode('dark'))
     act(() => run.api.theme?.setTheme('classic'))
@@ -143,9 +143,9 @@ describe('Classic Hermes is an explicit Desktop pick, never inferred from stock 
     run.connect()
 
     const themes = run.api.theme?.availableThemes ?? []
-    expect(themes.filter(t => t.label === 'Classic Hermes').map(t => t.name)).toEqual(['classic'])
+    expect(themes.filter(t => t.label === 'Classic').map(t => t.name)).toEqual(['classic'])
     expect(themes.some(t => t.name === 'default')).toBe(false)
-    expect(run.api.skin?.('list').match(/Classic Hermes/g)).toHaveLength(1)
+    expect(run.api.skin?.('list').match(/Classic/g)).toHaveLength(1)
     expect(JSON.parse(window.localStorage.getItem(BACKEND_THEMES_KEY) ?? '{}')).not.toHaveProperty('default')
   })
 

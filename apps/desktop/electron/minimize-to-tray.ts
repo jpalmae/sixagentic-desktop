@@ -183,13 +183,13 @@ export function createMinimizeToTray(options: Options) {
             height: process.platform === 'darwin' ? 18 : 24
           })
         )
-        tray.setToolTip('Hermes')
+        tray.setToolTip('SixAgentic Desktop') // SixAgentic Desktop rebrand
         tray.setContextMenu(
           Menu.buildFromTemplate([
-            { label: 'Show Hermes', click: restore },
+            { label: 'Show SixAgentic Desktop', click: restore }, // SixAgentic Desktop rebrand
             { type: 'separator' },
             // Do not bypass the ordinary active-work confirmation or teardown.
-            { label: 'Quit Hermes', click: () => app.quit() }
+            { label: 'Quit SixAgentic Desktop', click: () => app.quit() } // SixAgentic Desktop rebrand
           ])
         )
 

@@ -50,9 +50,9 @@ it('translates the live filter menu while preserving selected values and the cur
   expect($sidebarStatusFilter.get()).toContain('needs-input')
   await act(() => i18n.setLocale('ja'))
   const ja = TRANSLATIONS.ja.sidebar.filter
-  expect(screen.getByText(TRANSLATIONS.ja.sidebar.profileRail)).toBeTruthy()
+  expect(screen.getByText(TRANSLATIONS.ja.sidebar.filter.inboxStyle)).toBeTruthy()
   expect(screen.getByText(TRANSLATIONS.ja.sidebar.markAllRead)).toBeTruthy()
-  expect(screen.queryByText(TRANSLATIONS.en.sidebar.profileRail)).toBeNull()
+  expect(screen.queryByText(TRANSLATIONS.en.sidebar.filter.inboxStyle)).toBeNull()
   expect(screen.queryByText(TRANSLATIONS.en.sidebar.markAllRead)).toBeNull()
   fireEvent.keyDown(screen.getByRole('menuitem', { name: ja.status }), { key: 'ArrowRight' })
   expect(screen.getByRole('menuitemcheckbox', { name: ja.needsInput }).getAttribute('aria-checked')).toBe('true')

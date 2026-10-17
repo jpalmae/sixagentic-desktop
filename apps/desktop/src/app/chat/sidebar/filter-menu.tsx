@@ -58,11 +58,8 @@ import {
   $profiles,
   $showAllProfiles,
   normalizeProfileKey,
-  requestProfileCreate,
   toggleShowAllProfiles
 } from '@/store/profile'
-import { $profileRailVisible, toggleProfileRailVisible } from '@/store/profile-rail-prefs'
-import { runImportProfileFlow } from '@/store/profile-share'
 import { $projectTree } from '@/store/projects'
 import type { PullRequestBucket } from '@/store/pull-requests'
 import { $unreadFinishedSessionIds, markAllSessionsRead } from '@/store/session'
@@ -164,7 +161,6 @@ export function SidebarFilterMenu({ className }: { className?: string }) {
   const ordering = useStore($sidebarOrdering)
   const rowMeta = useStore($sidebarRowMeta)
   const cardRows = useStore($sidebarCardRows)
-  const profileRailVisible = useStore($profileRailVisible)
   const showAllSessions = useStore($sidebarShowAllSessions)
   const statusFilter = useStore($sidebarStatusFilter)
   const projectFilter = useStore($sidebarProjectFilter)
@@ -319,17 +315,6 @@ export function SidebarFilterMenu({ className }: { className?: string }) {
             onCheck={() => setSidebarCardRows(!cardRows)}
             option={{ icon: 'inbox', id: 'card-rows', label: f.inboxStyle }}
           />
-
-          {/* The colored strip at the sidebar foot. Off, the statusbar grows a
-              profile dropdown beside the gateway switcher, so nobody loses the
-              door — this is for people whose profiles are bots, not workspaces. */}
-          {showsAdvancedChrome && (
-            <OptionCheckbox
-              checked={profileRailVisible}
-              onCheck={toggleProfileRailVisible}
-              option={{ icon: 'organization', id: 'profile-rail', label: t.sidebar.profileRail }}
-            />
-          )}
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
@@ -373,25 +358,16 @@ export function SidebarFilterMenu({ className }: { className?: string }) {
             <DropdownMenuSubTrigger>{f.profile}</DropdownMenuSubTrigger>
             <DropdownMenuSubContent className="max-h-80 overflow-y-auto">
               {/* Scoped to one profile the rail is already the filter, so the
-                  per-profile boxes only appear where they can narrow something.
-                  The actions below stand on their own. */}
-              {narrowsByProfile && (
-                <>
-                  {profileNames.map(name => (
-                    <OptionCheckbox
-                      checked={profileFilter.includes(name)}
-                      key={name}
-                      onCheck={() => toggleSidebarProfileFilter(name)}
-                      option={{ icon: 'account', id: name, label: name }}
-                    />
-                  ))}
-                  <DropdownMenuSeparator />
-                </>
-              )}
-              <DropdownMenuItem onSelect={requestProfileCreate}>{t.profiles.newProfile}</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => void runImportProfileFlow()}>
-                {t.profiles.importProfile}
-              </DropdownMenuItem>
+                  per-profile boxes only appear where they can narrow something. */}
+              {narrowsByProfile &&
+                profileNames.map(name => (
+                  <OptionCheckbox
+                    checked={profileFilter.includes(name)}
+                    key={name}
+                    onCheck={() => toggleSidebarProfileFilter(name)}
+                    option={{ icon: 'account', id: name, label: name }}
+                  />
+                ))}
             </DropdownMenuSubContent>
           </DropdownMenuSub>
 

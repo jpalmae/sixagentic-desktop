@@ -135,15 +135,15 @@ describe('ProvidersSettings', () => {
       const { container } = render(<ProvidersSettings onClose={vi.fn()} onViewChange={vi.fn()} view="keys" />)
       await screen.findByText('Widget')
       expect(getEnvVars).toHaveBeenLastCalledWith('profile-b')
-      expect(screen.getByText('Applies to')).toBeTruthy()
       const input = container.querySelector('input[type="password"]')!
       fireEvent.focus(input)
       fireEvent.change(input, { target: { value: 'fixture-key' } })
       fireEvent.click(screen.getByRole('button', { name: 'Save' }))
       await waitFor(() => expect(setEnvVar).toHaveBeenCalledWith('WIDGET_API_KEY', 'fixture-key', 'profile-b'))
-      fireEvent.click(screen.getByRole('button', { name: 'profile-a' }))
       // Back onto the app's active profile: no override is stored, but the
-      // request must still name it (#118432).
+      // request must still name it (#118432). The scope picker is hidden, so
+      // the handoff store is driven directly (same path plugin deep links use).
+      act(() => $settingsScopeOverride.set(null))
       await waitFor(() => expect(getEnvVars).toHaveBeenLastCalledWith('profile-a'))
     } finally {
       cleanup()

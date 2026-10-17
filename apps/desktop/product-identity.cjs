@@ -8,17 +8,21 @@
 /// <reference types="node" />
 'use strict'
 
+/* SixAgentic rebrand — full filesystem isolation from a Hermes Desktop
+ * install: kebab/pascal identifiers own the SixAgentic domain, so appId,
+ * userData, the MSIX package family and the single-instance lock never
+ * collide with `hermes`. The CLI binary name stays "hermes" (see cliName). */
 const variants = {
-  '': { display: 'Hermes', kebab: 'hermes', pascal: 'Hermes' },
+  '': { display: 'SixAgentic Desktop', kebab: 'sixagentic', pascal: 'SixAgentic' },
   light: {
-    display: 'Hermes Light',
-    kebab: 'hermes-light',
-    pascal: 'HermesLight'
+    display: 'SixAgentic Desktop Light',
+    kebab: 'sixagentic-light',
+    pascal: 'SixAgenticLight'
   },
   bundled: {
-    display: 'Hermes Agent',
-    kebab: 'hermes-bundled',
-    pascal: 'HermesBundled'
+    display: 'SixAgentic Desktop Agent',
+    kebab: 'sixagentic-bundled',
+    pascal: 'SixAgenticBundled'
   }
 }
 
@@ -66,22 +70,22 @@ const identity = {
   store,
   light,
   displayName,
-  appId: `com.nousresearch.${name.kebab}${kebabSuffix}`,
+  appId: `com.sixagentic.${name.kebab}${kebabSuffix}`,
   // Store and commit builds do not publish a release feed.
   channel: store || buildCommit ? null : light ? (canary ? 'light-canary' : 'light') : (canary ? 'canary' : 'latest'),
   appNamePascal: `${name.pascal}${pascalSuffix}`,
   artifactNamePascal: name.pascal,
   windowsExecutableName: kebabSuffix ? cliName : displayName,
   cliName,
-  msixAppIdWithOrg: `NousResearch.${name.pascal}${pascalSuffix}`,
+  msixAppIdWithOrg: `SixAgentic.${name.pascal}${pascalSuffix}`,
   ...(store
     ? {
         storeMsix: {
           // Partner Center publisher identity (the account's publisher ID) —
           // validated + re-signed by the Store on submission.
-          identityName: 'NousResearchInc.HermesAgent',
+          identityName: 'SixAgenticInc.SixAgenticAgent',
           publisher: 'CN=EE6D86E4-606F-4E38-B940-AD7248C9D519',
-          publisherDisplayName: 'Nous Research Inc.'
+          publisherDisplayName: 'SixAgentic Inc.'
         }
       }
     : {})

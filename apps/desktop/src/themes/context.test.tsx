@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { $backendThemes, __resetBackendSkinSync, ingestBackendSkin } from './backend-sync'
 import { skinPref, ThemeProvider, useTheme } from './context'
-import { everforestTheme, midnightTheme } from './presets'
+import { everforestTheme, midnightTheme, sixagenticTheme } from './presets'
 import type { DesktopTheme } from './types'
 import { installUserTheme } from './user-themes'
 
@@ -333,7 +333,7 @@ describe('ThemeProvider customCSS injection', () => {
     expect(cssVar('--theme-background-seed')).not.toBe('#ff00ff')
   })
 
-  it('applies customCSS from a default-named user skin under the desktop default', () => {
+  it("keeps the built-in default's own customCSS over a default-named backend skin's", () => {
     render(
       <ThemeProvider>
         <div />
@@ -347,7 +347,10 @@ describe('ThemeProvider customCSS injection', () => {
       )
     )
 
-    expect(customStyleEl()?.textContent).toBe('.chat-input { font-size: 18px; }')
+    // The desktop default (sixagentic) ships its own chrome CSS; a backend
+    // `default` skin's CSS stays carried in $backendCustomCSS (see
+    // backend-sync.test.ts) but never replaces the built-in's own rules.
+    expect(customStyleEl()?.textContent).toBe(sixagenticTheme.customCSS?.trim())
   })
 })
 

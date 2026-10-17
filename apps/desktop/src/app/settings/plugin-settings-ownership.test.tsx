@@ -126,9 +126,6 @@ const renderSettings = (path: string) =>
     </MemoryRouter>
   )
 
-const chip = (name: string) =>
-  screen.queryAllByRole('button', { name }).find(el => el.className.includes('rounded-full'))
-
 const settingsCalls = () =>
   requestGateway.mock.calls.filter(([method, params]) => method === 'plugins.manage' && params?.action === 'settings')
 
@@ -179,7 +176,7 @@ describe('Settings ▸ Plugins ownership (review of #133182)', () => {
     fireEvent.change(screen.getByLabelText('Token'), { target: { value: 'DEFAULT-SECRET' } })
 
     held['review-b'] = deferred()
-    fireEvent.click(chip('review-b')!)
+    act(() => $settingsScopeOverride.set('review-b'))
 
     // B's list is still in flight: the A draft must be gone, and nothing can be saved.
     const stale = screen.queryByLabelText(/Destination/) as HTMLInputElement | null
@@ -235,20 +232,20 @@ describe('Settings ▸ Plugins ownership (review of #133182)', () => {
     expect(settingsCalls()[0]![1]).toMatchObject({ profile: 'review-b', values: { destination: 'GEAR-FOR-B' } })
   })
 
-  // P2: a profile without the plugin must keep the "Applies to" selector so the
-  // user can switch back.
-  it('keeps the profile selector on the overview when the selected profile lacks the plugin', async () => {
+  // P2: a profile without the plugin shows the empty state; a scope change
+  // through the handoff store (plugin deep links drive it — the visible
+  // picker is retired) restores the row.
+  it('shows the empty state for a profile lacking the plugin and recovers on a scope handoff', async () => {
     renderSettings(pluginSettingsHref())
     await waitFor(() => expect(document.querySelector('[data-tour$="review-notes"]')).toBeTruthy())
     fireEvent.click(document.querySelector<HTMLButtonElement>('[data-tour$="review-notes"]')!)
     await screen.findByLabelText(/Destination/)
 
-    fireEvent.click(chip('review-empty')!)
+    act(() => $settingsScopeOverride.set('review-empty'))
     await waitFor(() => expect(screen.queryByLabelText(/Destination/)).toBeNull())
     await waitFor(() => expect(screen.getByText('No plugin has settings yet.')).toBeTruthy())
 
-    expect(chip('default')).toBeTruthy()
-    fireEvent.click(chip('default')!)
+    act(() => $settingsScopeOverride.set(null))
     await waitFor(() => expect(document.querySelector('[data-tour$="review-notes"]')).toBeTruthy())
   })
 

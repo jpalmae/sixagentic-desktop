@@ -97,7 +97,7 @@ describe('ctx.runAction — plugins run built-in app actions', () => {
     const run = ctx.runAction as (id: string) => PluginRunActionResult
 
     expect(run('session.archive')).toMatchObject({ ok: false, reason: 'denied' })
-    expect(run('profile.switch.1')).toMatchObject({ ok: false, reason: 'denied' })
+    expect(run('session.togglePin')).toMatchObject({ ok: false, reason: 'denied' })
     expect(run('composer.modelPicker')).toMatchObject({ ok: false, reason: 'denied' })
     expect(deps.archiveSelectedSession).not.toHaveBeenCalled()
 

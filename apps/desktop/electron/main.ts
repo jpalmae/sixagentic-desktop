@@ -1409,7 +1409,7 @@ const BOOT_FAKE_STEP_MS = (() => {
   return Math.max(120, raw)
 })()
 
-const APP_NAME: string = IDENTITY_APP_NAME || process.env.HERMES_DESKTOP_APP_NAME || 'Hermes'
+const APP_NAME: string = IDENTITY_APP_NAME || process.env.HERMES_DESKTOP_APP_NAME || 'SixAgentic Desktop' // SixAgentic Desktop rebrand
 const HUD_WINDOW_TITLE = `${APP_NAME} HUD`
 const TITLEBAR_HEIGHT = 34
 const MACOS_TRAFFIC_LIGHTS_HEIGHT = 14
@@ -1816,12 +1816,12 @@ Menu.setApplicationMenu(null)
 // Windows toast notifications silently no-op unless an AppUserModelID is set:
 // `new Notification().show()` returns without error and nothing appears. The
 // AUMID must match the installed Start Menu shortcut's AUMID, which
-// electron-builder derives from the build `appId` (com.nousresearch.hermes) —
+// electron-builder derives from the build `appId` (com.sixagentic.sixagentic) —
 // keep this string in sync with package.json `build.appId`. macOS/Linux don't
 // need this, so gate it on Windows. (Fixes: desktop approval/turn notifications
 // never firing on Windows.)
 if (IS_WINDOWS) {
-  app.setAppUserModelId(IDENTITY_APP_NAME ? PRODUCT_IDENTITY.appId : 'com.nousresearch.hermes')
+  app.setAppUserModelId(IDENTITY_APP_NAME ? PRODUCT_IDENTITY.appId : 'com.sixagentic.sixagentic')
 }
 
 // Seed the native About panel with the best-known Hermes version. This is
@@ -1972,7 +1972,7 @@ let desktopLogFlushPromise = Promise.resolve()
 // Land a spawn failure in desktop.log.
 function logPoolSpawnFailure(label: string, error: unknown): void {
   rememberLog(
-    `Hermes backend for profile ${label} failed to start: ${error instanceof Error ? error.message : String(error)}`
+    `SixAgentic Desktop backend for profile ${label} failed to start: ${error instanceof Error ? error.message : String(error)}`
   )
 }
 
@@ -2034,7 +2034,7 @@ let bootProgressState = {
   error: null,
   fakeMode: BOOT_FAKE_MODE,
   isCloudBackendDown: false,
-  message: 'Waiting to start Hermes backend',
+  message: 'Waiting to start SixAgentic Desktop backend',
   phase: 'idle',
   progress: 0,
   retryable: false,
@@ -2862,7 +2862,7 @@ async function waitForUpdateToFinish() {
 
         await advanceBootProgress(
           'backend.update-wait',
-          'An update is still running — Hermes will start automatically when it finishes. Its progress is in logs/update.log.',
+          'An update is still running — SixAgentic Desktop will start automatically when it finishes. Its progress is in logs/update.log.',
           12
         )
 
@@ -2871,7 +2871,7 @@ async function waitForUpdateToFinish() {
 
       await advanceBootProgress(
         'backend.update-wait',
-        'An update is finishing — Hermes will start automatically when it completes…',
+        'An update is finishing — SixAgentic Desktop will start automatically when it completes…',
         12
       )
     },
@@ -2915,7 +2915,7 @@ async function waitForUpdateToFinish() {
       log: rememberLog
     })
   ) {
-    await advanceBootProgress('backend.update-restart', 'Restarting Hermes to load the updated app…', 14)
+    await advanceBootProgress('backend.update-restart', 'Restarting SixAgentic Desktop to load the updated app…', 14)
     // Park while the scheduled exit lands so this stale build never starts a
     // backend; the failsafe below only runs if the exit somehow does not.
     await new Promise(resolve => setTimeout(resolve, BUNDLE_SWAP_RELAUNCH_FAILSAFE_MS))
@@ -5173,7 +5173,7 @@ async function resolveHermesBackend(backendArgs: string[]): Promise<ResolvedHerm
   //    is a recoverable state the GUI can drive through.
   return {
     kind: 'bootstrap-needed',
-    label: 'Hermes Agent not installed yet; bootstrap required',
+    label: 'SixAgentic Desktop Agent not installed yet; bootstrap required', // SixAgentic Desktop rebrand
     command: null,
     args: backendArgs,
     bootstrap: true,
@@ -7393,7 +7393,7 @@ function openOauthLoginWindow(
       win = new BrowserWindow({
         width: 520,
         height: 720,
-        title: silent ? 'Connecting to Hermes Cloud agent…' : 'Sign in to Hermes gateway',
+        title: silent ? 'Connecting to Hermes Cloud agent…' : 'Sign in to SixAgentic Desktop gateway', // SixAgentic Desktop rebrand
         autoHideMenuBar: true,
         // Silent cascade: start HIDDEN. The auto-SSO 302 chain completes in
         // well under a second, so the window normally never needs to show. We
@@ -12577,7 +12577,7 @@ function spawnSecondaryWindow({
     height: SESSION_WINDOW_MIN_HEIGHT,
     minWidth: SESSION_WINDOW_MIN_WIDTH,
     minHeight: SESSION_WINDOW_MIN_HEIGHT,
-    title: 'Hermes',
+    title: 'SixAgentic Desktop', // SixAgentic Desktop rebrand
     titleBarStyle: 'hidden',
     titleBarOverlay: getTitleBarOverlayOptions(),
     trafficLightPosition: IS_MAC ? WINDOW_BUTTON_POSITION : undefined,
@@ -12682,7 +12682,7 @@ function spawnBrowserWindow(tabId) {
     height: BROWSER_WINDOW_HEIGHT,
     minWidth: BROWSER_WINDOW_MIN_WIDTH,
     minHeight: BROWSER_WINDOW_MIN_HEIGHT,
-    title: 'Hermes',
+    title: 'SixAgentic Desktop', // SixAgentic Desktop rebrand
     titleBarStyle: 'hidden',
     titleBarOverlay: getTitleBarOverlayOptions(),
     trafficLightPosition: IS_MAC ? WINDOW_BUTTON_POSITION : undefined,
@@ -12794,7 +12794,7 @@ function createInstanceWindow(
     ...nextInstanceBounds(source),
     minWidth: WINDOW_MIN_WIDTH,
     minHeight: WINDOW_MIN_HEIGHT,
-    title: 'Hermes',
+    title: 'SixAgentic Desktop', // SixAgentic Desktop rebrand
     titleBarStyle: 'hidden',
     titleBarOverlay: getTitleBarOverlayOptions(),
     trafficLightPosition: IS_MAC ? WINDOW_BUTTON_POSITION : undefined,
@@ -13879,7 +13879,7 @@ function createWindow() {
     ),
     minWidth: WINDOW_MIN_WIDTH,
     minHeight: WINDOW_MIN_HEIGHT,
-    title: 'Hermes',
+    title: 'SixAgentic Desktop', // SixAgentic Desktop rebrand
     // Frameless title bar on every platform so the renderer can paint the
     // "hide sidebar" button (and other left-side titlebar tools) flush with
     // the top edge — matching the macOS layout where the traffic lights sit
@@ -14259,7 +14259,7 @@ function createWindow() {
         const exit = details?.exitCode === undefined ? '' : `, exit code ${String(details.exitCode)}`
         rememberLog(`[renderer:main] renderer terminated while live (reason=${reason}${exit}); surfacing recovery page`)
         void loadRendererLoadErrorPage(mainWindow, {
-          title: 'Hermes desktop UI was terminated',
+          title: 'SixAgentic Desktop UI was terminated', // SixAgentic Desktop rebrand
           errorDescription:
             `The desktop UI process was terminated unexpectedly (reason: ${reason}${exit}). ` +
             'Your sessions and the background gateway are unaffected — reload to continue.',
@@ -17932,20 +17932,22 @@ ipcMain.handle('hermes:vscode-theme:fetch', async (_event, id) => fetchMarketpla
 ipcMain.handle('hermes:vscode-theme:search', async (_event, query) => searchMarketplaceThemes(String(query || ''), 20))
 
 // ---------------------------------------------------------------------------
-// hermes:// deep links (e.g. hermes://blueprint/morning-brief?time=08:00,
-// hermes://mcp/install?name=NAME&config=B64 — the vendor "Add to Hermes"
-// button, or hermes://plugin/install?repo=owner/repo). Dev
-// (`HERMES_DESKTOP_DEV_SERVER`) registers hermes-dev:// instead — bare
-// Electron or a stale OS handler often owns hermes:// on dev machines.
+// sixagentic:// deep links (e.g. sixagentic://blueprint/morning-brief?time=08:00,
+// sixagentic://mcp/install?name=NAME&config=B64 — the vendor "Add to SixAgentic Desktop"
+// button, or sixagentic://plugin/install?repo=owner/repo). Dev
+// (`HERMES_DESKTOP_DEV_SERVER`) registers sixagentic-dev:// instead — bare
+// Electron or a stale OS handler often owns sixagentic:// on dev machines.
 // Parsing is generic ({kind, name, params}); the renderer routes per kind
 // and anything install-shaped requires explicit user confirmation there.
 // A docs/dashboard "Send to App" button opens this URL; we route it into the
 // running app. Three delivery paths: macOS 'open-url',
 // Win/Linux running-app 'second-instance' (argv), Win/Linux cold-start argv.
 // ---------------------------------------------------------------------------
-const HERMES_PROTOCOL = DEV_SERVER ? 'hermes-dev' : 'hermes'
+/* SixAgentic Desktop rebrand — sixagentic:// deep links; hermes:// stays owned by a
+ * Hermes Desktop install and is never registered here. */
+const HERMES_PROTOCOL = DEV_SERVER ? 'sixagentic-dev' : 'sixagentic'
 /** Schemes accepted when parsing inbound URLs (dev accepts both). */
-const DEEPLINK_SCHEMES = DEV_SERVER ? ['hermes-dev', 'hermes'] : ['hermes']
+const DEEPLINK_SCHEMES = DEV_SERVER ? ['sixagentic-dev', 'sixagentic'] : ['sixagentic']
 let _pendingDeepLink = null
 let _rendererReadyForDeepLink = false
 // Set by sendOpenUpdatesRequested() when the renderer cannot hear it yet.
@@ -17982,7 +17984,7 @@ function handleDeepLink(url) {
     return
   }
 
-  // hermes://blueprint/<key>?slot=val  -> host="blueprint", path="/<key>"
+  // sixagentic://blueprint/<key>?slot=val  -> host="blueprint", path="/<key>"
   const kind = parsed.hostname || ''
   const name = decodeURIComponent((parsed.pathname || '').replace(/^\//, ''))
   const params = {}
@@ -18003,7 +18005,7 @@ function handleDeepLink(url) {
     return
   }
 
-  // hermes://close-preview — the out-of-band exit hatch for a preview pane
+  // sixagentic://close-preview — the out-of-band exit hatch for a preview pane
   // that fullscreened itself and now owns all input (#97213). Handled here
   // rather than in the renderer because the whole point is to work when the
   // renderer cannot hear anything: exit the fullscreen window and close the
@@ -18114,12 +18116,12 @@ if (!isPrimaryInstance) {
   }
 
   app.on('second-instance', (_event, argv) => {
-    // --close-preview: the same escape hatch as hermes://close-preview, for
+    // --close-preview: the same escape hatch as sixagentic://close-preview, for
     // environments where spawning a URL is harder than a flag (kiosk launchers,
-    // SSH-started sessions). Checked before deep links so a carried `hermes://`
+    // SSH-started sessions). Checked before deep links so a carried `sixagentic://`
     // URL still routes normally when no flag is present.
     if (hasClosePreviewFlag(argv)) {
-      handleDeepLink('hermes://close-preview')
+      handleDeepLink(`${HERMES_PROTOCOL}://close-preview`)
     }
 
     const url = _extractDeepLink(argv)

@@ -91,7 +91,7 @@ it('reveals only the shortcut target after a hold and clears on release, blur or
   act(() => {
     modifier(true)
     vi.advanceTimersByTime(400)
-    $capture.set('profile.switch.1')
+    $capture.set('session.new')
   })
   expect(container.querySelector('[data-tab-key-hint]')).toBeNull()
 })

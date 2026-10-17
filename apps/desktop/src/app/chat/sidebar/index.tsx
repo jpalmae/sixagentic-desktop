@@ -86,7 +86,6 @@ import {
   normalizeProfileKey,
   sidebarProfileForScope
 } from '@/store/profile'
-import { $profileRailVisible } from '@/store/profile-rail-prefs'
 import { $projectScope, ALL_PROJECTS, exitProjectScope } from '@/store/project-scope'
 import {
   $activeProjectId,
@@ -157,7 +156,6 @@ import { buildGatewaySessionGroups, scopeGatewaySessionGroups, useGatewaySession
 import { SidebarLoadMoreRow } from './load-more-row'
 import { orderByIds, reconcileOrderIds, resolveManualSessionOrderIds, sameIds } from './order'
 import { filterSessionsByProfileScope } from './profile-scope'
-import { ProfileRail } from './profile-switcher'
 import { ProjectDialog } from './project-dialog'
 import { filterToSessionBearingProjects, resolveLiveProjectFilter } from './project-filter'
 import {
@@ -584,7 +582,6 @@ export function ChatSidebar({
   }, [])
 
   const activeSidebarSessionId = currentView === 'chat' ? selectedSessionId : null
-  const profileRailVisible = useStore($profileRailVisible)
 
   const dndSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -1574,7 +1571,28 @@ export function ChatSidebar({
       data-tour="sessions-sidebar"
     >
       <SidebarContent className="gap-0 overflow-hidden bg-transparent px-2.5">
-        <SidebarGroup className="shrink-0 p-0 pb-2 pt-[calc(var(--titlebar-height)+0.375rem)]">
+        {/* SixAgentic rebrand — mono uppercase "system online" status header,
+            sixmanager.com style. Dot follows the live gateway socket state. */}
+        <div
+          className="flex shrink-0 select-none items-center gap-2 px-2 pb-2 pt-[calc(var(--titlebar-height)+0.375rem)]"
+          data-tip-region=""
+        >
+          <span
+            aria-hidden
+            className="size-1.5 shrink-0 rounded-full"
+            style={{
+              backgroundColor:
+                gatewayState === 'open' ? '#559E44' : gatewayState === 'connecting' ? '#d29922' : '#ef5350'
+            }}
+          />
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-(--ui-text-secondary)">
+            SixAgentic <span className="text-(--ui-text-tertiary)">/</span>{' '}
+            <span className="text-(--ui-accent-secondary, #7FC4FF)">
+              {gatewayState === 'open' ? 'System online' : gatewayState === 'connecting' ? 'Connecting' : 'Offline'}
+            </span>
+          </span>
+        </div>
+        <SidebarGroup className="shrink-0 p-0 pb-2">
           <SidebarGroupContent>
             <SidebarMenu className="gap-px">
               {navItems.map(item => {
@@ -2058,14 +2076,6 @@ export function ChatSidebar({
         )}
 
         {!showSessionSections && <SidebarBlankState onNewProject={openProjectCreate} />}
-
-        {/* Off, the statusbar's profile dropdown (beside the gateway switcher)
-            takes over — the rail is a duplicate door for bot-only setups. */}
-        {profileRailVisible && (
-          <div className="shrink-0 px-0.5 pb-1 pt-0.5">
-            <ProfileRail />
-          </div>
-        )}
       </SidebarContent>
       <ProjectDialog />
       {/* One mount for the whole app. The header of WorktreeDialog tells why. */}

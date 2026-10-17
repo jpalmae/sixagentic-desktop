@@ -5,7 +5,6 @@ import { type MutableRefObject, useCallback, useRef } from 'react'
 import { mergeOlderTranscriptPage } from '@/app/chat/transcript-backfill'
 import { prepareDefaultNewSession } from '@/app/session/new-session-route'
 import { invalidateContextBreakdown } from '@/app/shell/hooks/use-context-breakdown'
-import { getProfiles } from '@/hermes'
 import type { Translations } from '@/i18n'
 import { type ChatMessage, toChatMessages } from '@/lib/chat-messages'
 import { sessionTitle } from '@/lib/chat-runtime'
@@ -30,13 +29,7 @@ import { applyGoalStatusText } from '@/store/goals'
 import { dismissNotification, notify, notifyError } from '@/store/notifications'
 import { setPetScale } from '@/store/pet-gallery'
 import { $petGenInput, openPetGenerate } from '@/store/pet-generate'
-import {
-  $activeGatewayProfile,
-  $newChatProfile,
-  captureNewChatSource,
-  ensureGatewayProfile,
-  normalizeProfileKey
-} from '@/store/profile'
+import { $activeGatewayProfile, normalizeProfileKey } from '@/store/profile'
 import {
   $connection,
   $sessions,
@@ -1146,45 +1139,13 @@ export function useSlashCommand(deps: SlashCommandDeps) {
             appendSessionTextMessage(sid, 'system', recordInput ? slashStatusText(command, result.error) : result.error)
           }
         },
-        // /profile selects which profile new chats open in — no app relaunch.
-        // A profile is per-session now, so an existing thread can't change its
-        // profile mid-stream; `/profile <name>` points the next new chat (and
-        // the current empty draft) at that profile's backend.
-        profile: async ({ arg }) => {
-          const target = arg.trim()
+        // /profile is status-only on desktop: the app runs the default
+        // profile, so the command reports the active profile and never
+        // switches. Any argument is ignored.
+        profile: async () => {
           const current = normalizeProfileKey($activeGatewayProfile.get())
 
-          if (!target) {
-            notify({ kind: 'success', message: copy.profileStatus(current) })
-
-            return
-          }
-
-          try {
-            const { profiles } = await getProfiles()
-            const match = profiles.find(profile => profile.name === target)
-
-            if (!match) {
-              notify({
-                kind: 'error',
-                title: copy.unknownProfile,
-                message: copy.noProfileNamed(target, profiles.map(profile => profile.name).join(', '))
-              })
-
-              return
-            }
-
-            const key = normalizeProfileKey(match.name)
-
-            $newChatProfile.set(key)
-            await ensureGatewayProfile(key)
-            // Capture the source the swap landed on (null on the v1 profile path)
-            // so the draft's owner matches the socket that will mint it.
-            captureNewChatSource()
-            notify({ kind: 'success', message: copy.newChatsProfile(match.name) })
-          } catch (err) {
-            notifyError(err, copy.setProfileFailed)
-          }
+          notify({ kind: 'success', message: copy.profileStatus(current) })
         },
         skin: async ({ arg, command, recordInput, sessionHint }) => {
           const sid = sessionHint || activeSessionIdRef.current

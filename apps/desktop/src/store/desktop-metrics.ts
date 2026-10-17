@@ -273,7 +273,7 @@ export const DESKTOP_BUTTON_ACTIONS = {
 export type DesktopActionVia = 'click' | 'menu' | 'palette' | 'shortcut'
 
 /** Built-in action ids (DESKTOP_ACTION_IDS on the backend); anything else — a plugin's palette
- *  command or keybinding, a numbered slot (`profile.switch.3`) — is `other`. */
+ *  command or keybinding, a numbered slot (`view.tabSlot.3`) — is `other`. */
 const ACTION_IDS: ReadonlySet<string> = new Set(
   [
     ...KEYBIND_ACTION_IDS,

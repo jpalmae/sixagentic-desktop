@@ -10,7 +10,7 @@ export const deNotices = {
   butterbar: {
     goTo: (index, total) => `Hinweis ${index} von ${total} anzeigen`,
     legal: {
-      before: 'Die Nutzung von Hermes Agent unterliegt unseren ',
+      before: 'Die Nutzung von SixAgentic Desktop Agent unterliegt unseren ',
       terms: 'Nutzungsbedingungen',
       between: ' und unserer ',
       privacy: 'Datenschutzerklärung',
@@ -27,9 +27,9 @@ export const deNotices = {
     sessionCommands: deSessionCommands
   },
   keepAwakeOffer: {
-    title: 'Ihr Computer ist eingeschlafen, während Hermes gearbeitet hat',
+    title: 'Ihr Computer ist eingeschlafen, während SixAgentic Desktop gearbeitet hat',
     message:
-      'Hermes kann den Computer wach halten, solange eine Aufgabe läuft. Der Bildschirm schaltet sich weiterhin aus, und im Akkubetrieb kann der Computer trotzdem einschlafen.',
+      'SixAgentic Desktop kann den Computer wach halten, solange eine Aufgabe läuft. Der Bildschirm schaltet sich weiterhin aus, und im Akkubetrieb kann der Computer trotzdem einschlafen.',
     action: 'Während der Arbeit wach halten'
   }
 } satisfies Pick<TranslationOverrides, 'remoteDisplayBanner' | 'butterbar' | 'promptNotices' | 'keepAwakeOffer'>
