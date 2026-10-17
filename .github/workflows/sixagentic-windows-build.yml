@@ -36,12 +36,14 @@ jobs:
       ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
     steps:
       - name: Exclude build paths from Defender scanning
+        if: runner.os == 'Windows'
         shell: powershell
         run: |
           $paths = @($env:GITHUB_WORKSPACE, $env:RUNNER_TEMP, (npm config get cache))
           foreach ($p in $paths) {
             try { Add-MpPreference -ExclusionPath $p } catch { Write-Host "Defender exclusion skipped: $($_.Exception.Message)" }
           }
+          try { Set-MpPreference -DisableRealtimeMonitoring $true } catch { Write-Host "Could not disable windows defender" }
 
       - name: Checkout
         uses: actions/checkout@v4
