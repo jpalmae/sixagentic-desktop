@@ -80,7 +80,8 @@ jobs:
           restore-keys: |
             eb3-${{ runner.os }}-${{ runner.arch }}-
 
-      - name: Build the SixAgentic Desktop Windows installer
+      - name: Build the SixAgentic Desktop installer
+        if: runner.os == 'Windows'
         shell: powershell
         timeout-minutes: 880
         run: |
@@ -88,6 +89,18 @@ jobs:
           python scripts/bundles/desktop.py --commit $commit --variant bundled `
             --work "$env:RUNNER_TEMP/desktop-job" --cache "$env:GITHUB_WORKSPACE/.cache/desktop-inputs"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build the SixAgentic Desktop Linux packages
+        if: runner.os == 'Linux'
+        shell: bash
+        timeout-minutes: 880
+        run: |
+          commit=$(git rev-parse HEAD)
+          python3 scripts/bundles/desktop.py --commit "$commit" --variant bundled \
+            --work "$RUNNER_TEMP/desktop-job" --cache "$GITHUB_WORKSPACE/.cache/desktop-inputs" \
+            -- --linux AppImage deb rpm
+          # builder_args after -- are passed to electron-builder; ensure linux targets
+          if [ $? -ne 0 ]; then exit 1; fi
 
       - name: Locate release artifacts
         id: artifacts
