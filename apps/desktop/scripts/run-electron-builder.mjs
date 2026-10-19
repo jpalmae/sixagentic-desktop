@@ -80,6 +80,10 @@ function toolsetArguments(inputs) {
     const destination = path.join(tools, name)
     fs.rmSync(destination, { recursive: true, force: true })
     fs.cpSync(directory, destination, { recursive: true, verbatimSymlinks: true })
+    // Force CJS resolution for toolset scripts: they are esbuild CJS bundles
+    // using require(); without this marker, "type": "module" from apps/desktop
+    // makes Node treat .js as ESM and crash.
+    fs.writeFileSync(path.join(destination, 'package.json'), JSON.stringify({ type: 'commonjs' }))
     // Upstream parses this as a literal path after slicing file:// (not URL decoding).
     return `-c.toolsets.${name}.url=file://${destination}`
   })
