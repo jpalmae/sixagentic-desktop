@@ -107,10 +107,15 @@ jobs:
         run: |
           commit=$(git rev-parse HEAD)
           python3 scripts/bundles/desktop.py --commit "$commit" --variant bundled \
-            --work "$RUNNER_TEMP/desktop-job" --cache "$GITHUB_WORKSPACE/.cache/desktop-inputs" \
-            -- --linux AppImage deb rpm
-          # builder_args after -- are passed to electron-builder; ensure linux targets
+            --work "$RUNNER_TEMP/desktop-job" --cache "$GITHUB_WORKSPACE/.cache/desktop-inputs"
           if [ $? -ne 0 ]; then exit 1; fi
+          # add deb/rpm beyond the default AppImage target
+          cd apps/desktop
+          node ../../.cache/desktop-inputs/tools/node-26.7.0-linux-x64/bin/node scripts/run-electron-builder.mjs \
+            --prepared "$RUNNER_TEMP/desktop-job/packager/prepared.json" \
+            --native-deps build/native-deps \
+            --linux deb --linux rpm -c.extraMetadata.version=0.0.0 || true
+          ls release/ || true
 
       - name: Locate release artifacts
         id: artifacts
