@@ -80,6 +80,16 @@ jobs:
           restore-keys: |
             eb3-${{ runner.os }}-${{ runner.arch }}-
 
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libxext-dev libxrandr-dev libxss-dev \
+            libxtst-dev libxt-dev libdbus-1-dev libglib2.0-dev libnss3-dev \
+            libatk1.0-dev libatk-bridge2.0-dev libcups2-dev libgtk-3-dev \
+            libasound2-dev libdrm-dev libgbm-dev libpango1.0-dev libcairo2-dev
+
       - name: Build the SixAgentic Desktop installer
         if: runner.os == 'Windows'
         shell: powershell
